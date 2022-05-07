@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Spil</title>
+    <style>
+    	/* * { padding: 0; margin: 0; } */
+    	canvas { background: rgb(153, 152, 227); display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <p id="Tekst">
+    <h2>Ping pong(ish):</h2>
+    <h3 id="score1">Score1 (blue):</h3>
+    <h3 id="score2">Score2 (red):</h3>
+    </p>
+
+<canvas id="myCanvas" width="480" height="320"></canvas> 
+
+<script>
+
+var bredde = "480"
+var height = "320"
+var canvas = document.getElementById("myCanvas"); //Variabel med canvas 
+var ctx = canvas.getContext("2d"); //Context variabel
+var x = canvas.width/2; //startposition af bold
+var y = canvas.height/2; //startposition af bold
+var dx = 2;
+var dy = -2;
+var radius = 20;
+var score1 = 0;
+var score2 = 0;
+
+    
+//Herunder er variabler der bliver erklæret
+var firkantheight = "30";
+var firkantbredde = "30";
+var firkantx = (bredde / 2) - (firkantbredde / 2)
+var firkanty = height - firkantheight
+var Rightpil = false; //False fordi, de ikke har en værdi. Skal tildeles værdi senere i programmet
+var Venstrepil = false;
+var dknap = false;
+var aknap = false;
+var firkant2x = (bredde / 2) - (firkantbredde / 2)
+var firkant2y = 0;
+    
+document.addEventListener("keydown", keyDownHandler, false);//addeventlistener fungerer ved (event, funktion, usecapture). Event er f.eks. tastaturtryk. Funktion er den funktion, som skal kaldes når eventet sker. 
+document.addEventListener("keyup", keyUpHandler, false);
+
+document.addEventListener("keydown", keyAHandler, false);
+document.addEventListener("keyup", keyDHandler, false);
+
+function keyDownHandler(e) {
+    if(e.key == "Right" || e.key == "ArrowRight") {
+        Rightpil = true; 
+    }
+    else if(e.key == "Left" || e.key == "ArrowLeft") {
+        Venstrepil = true;
+    }
+}
+
+function keyUpHandler(e) {
+    if(e.key == "Right" || e.key == "ArrowRight") { //To lodrette betyder eller. Er her indsat for at begge piletaster virker, hvis det er et større tastatur
+        Rightpil = false;
+    }
+    else if(e.key == "Left" || e.key == "ArrowLeft") {
+        Venstrepil = false;
+    }
+}
+
+function keyAHandler(e) {
+    if(e.key == "d") {
+        dknap = true;
+    }
+    else if(e.key == "a") {
+        aknap = true;
+    }
+}
+
+function keyDHandler(e) {
+    if(e.key == "d") {
+        dknap = false;
+    }
+    else if(e.key == "a") {
+        aknap = false;
+    }
+}
+
+
+function bolden() { //tegner bold
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI*2);
+    ctx.fillStyle = "#32CD32";
+    ctx.fill();
+    ctx.closePath();
+}
+
+
+function drawfirkant () {
+    ctx.beginPath();
+    ctx.rect(firkantx, firkanty, firkantbredde, firkantheight);
+    ctx.fillStyle = "#0000CD";
+    ctx.fill();
+    ctx.closePath();
+}
+
+function drawfirkant2 () {
+    ctx.beginPath();
+    ctx.rect(firkant2x, firkant2y, firkantbredde, firkantheight);
+    ctx.fillStyle = "#FF0000";
+    ctx.fill();
+    ctx.closePath();
+}
+    
+function draw() {  //tegner baggrunden og bold - så det ikke bliver en lang linje
+    ctx.clearRect(0, 0, canvas.width, canvas.height); //sletter baggrund 
+    bolden(); //kalder bold
+    drawfirkant(); //kalder firkant
+    drawfirkant2();//Kalder firkant to
+
+    if(y + dy < 0) { //Gør at bolden ikke ryger ud over bund
+    dy = -dy;
+    score1 += 1;
+}
+    if(y + dy > height ) {//Gør at bolden ikke ryger ud over top 
+    dy = -dy;
+    score2 += 1;
+}
+    if(x + dx < 0) { //Gør at bolden ikke ryger ud over siderne
+    dx = -dx;
+}
+    if(x + dx > bredde ) { //Gør at bolden ikke ryger ud over siderne
+    dx = -dx;
+}
+  
+     if(Rightpil) {
+        firkantx += 2;
+        if (firkantx + firkantbredde > bredde){
+            firkantx = bredde - firkantbredde;
+        }
+    }
+    else if(Venstrepil) {
+        firkantx -= 2;
+        if (firkantx < 0){
+            firkantx = 0;
+        }
+    }
+
+    
+   if(dknap) { //Hvid dknap = true kører dette statement
+        firkant2x += 2; //Lægger to pixels til firkantx
+        if (firkant2x + firkantbredde > bredde){ 
+            firkant2x = bredde - firkantbredde; //Sørger for firkanten kun går til kanten af canvas
+        }
+    }
+    else if(aknap) {
+        firkant2x -= 2;
+        if (firkant2x < 0){
+            firkant2x = 0;
+        }
+    }
+    
+    x += dx; //får bolden til at bevæge sig
+    y += dy; //får bolden til at bevæge sig
+    
+    if ((x > firkantx && x < firkantx + firkantbredde) && (y + radius >= firkanty )) {
+    dx *= -1;  // får bolden til at vende, hvis den rammer kanten
+    dy *= -1; 
+    /*score ++; //tæller op med en */ //virker ikke endnu
+
+
+}
+
+if ((x > firkant2x && x < firkant2x + firkantbredde) && (y - radius <= firkant2y + firkantheight)) {
+
+dx *= -1;  // får bolden til at vende 
+dy *= -1; 
+//score ++; //tæller op med en */ //virker ikke endnu
+}
+
+let Point1 = "Blue player point: " + score1 ;
+
+document.getElementById("score1").innerHTML = Point1;
+    
+let Point2 = "Red player point: " + score2 ;
+
+document.getElementById("score2").innerHTML = Point2;
+}
+
+setInterval(draw, 10); //kalder funktionerne hvert 10. millisekund (indbygget funktion)
+
+
+</script> 
+
+</body>
+</html>
